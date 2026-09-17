@@ -30,30 +30,30 @@ public class SealedArtifactEffectHandler {
         if (UndyingSealAbility.isSealed(player.getUUID(), player.level().getGameTime())) {
             return;
         }
-
+        // Sealed Artifacts Rework:
         // Check main hand
         ItemStack mainHand = player.getMainHandItem();
-        if (mainHand.getItem() instanceof SealedArtifactItem) {
+        if (mainHand.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
             applyHandNegativeEffect(player, mainHand, true);
         }
 
         // Check off hand
         ItemStack offHand = player.getOffhandItem();
-        if (offHand.getItem() instanceof SealedArtifactItem) {
+        if (offHand.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
             applyHandNegativeEffect(player, offHand, false);
         }
 
         // check hotbar
         for (int i = 0; i < 9; i++) {
             ItemStack stack = player.getInventory().getItem(i);
-            if (stack.getItem() instanceof SealedArtifactItem) {
+            if (stack.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
                 applyHotBarNegativeEffect(player, stack);
             }
         }
 
         // Check inventory for some passive effects (optional)
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof SealedArtifactItem) {
+            if (stack.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
                 SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);
                 if (data != null) {
                     applyInventoryEffect(player, data);
@@ -61,6 +61,7 @@ public class SealedArtifactEffectHandler {
             }
         }
     }
+    // Sealed Artifacts Rework:
 
 
     private static void applyHandNegativeEffect(Player player, ItemStack stack, boolean inMainHand) {

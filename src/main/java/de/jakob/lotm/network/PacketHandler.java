@@ -4,6 +4,7 @@ import de.jakob.lotm.LOTMCraft;
 import de.jakob.lotm.network.packets.toClient.*;
 import de.jakob.lotm.network.packets.toServer.*;
 import de.jakob.lotm.util.BeyonderData;
+import main.java.de.jakob.lotm.network.packets.toServer.UseArtifactAbilityPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
@@ -702,7 +703,13 @@ public class PacketHandler {
                 NextArtifactAbilityPacket.STREAM_CODEC,
                 NextArtifactAbilityPacket::handle
         );
-
+        //Sealed artifact Rework:
+        registrar.playToServer(
+                UseArtifactAbilityPacket.TYPE,
+                UseArtifactAbilityPacket.STREAM_CODEC,
+                UseArtifactAbilityPacket::handle
+        );
+        //Sealed artifact Rework:
         registrar.playToServer(
                 RequestQuestDataPacket.TYPE,
                 RequestQuestDataPacket.STREAM_CODEC,

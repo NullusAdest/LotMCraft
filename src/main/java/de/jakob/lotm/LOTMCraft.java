@@ -166,6 +166,7 @@ public class LOTMCraft
     public static KeyMapping previousSharedAbilityKey;
     public static KeyMapping openMarionetteMenuKey;
     public static KeyMapping nextMarionetteKey;
+    public static KeyMapping useArtifactAbilityKey;
 
     public static KeyMapping useAbilityBarAbility1;
     public static KeyMapping useAbilityBarAbility2;

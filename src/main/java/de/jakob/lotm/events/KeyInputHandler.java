@@ -10,6 +10,7 @@ import de.jakob.lotm.network.PacketHandler;
 import de.jakob.lotm.network.packets.toServer.*;
 import de.jakob.lotm.util.ClientBeyonderCache;
 import de.jakob.lotm.util.data.AbilityWheelClientData;
+import main.java.de.jakob.lotm.network.packets.toServer.UseArtifactAbilityPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -260,6 +261,11 @@ public class KeyInputHandler {
         if(LOTMCraft.nextMarionetteKey != null && LOTMCraft.nextMarionetteKey.consumeClick()) {
             PacketHandler.sendToServer(new NextMarionettePacket());
         }
+        //Sealed Articat Rework:
+        if (LOTMCraft.useArtifactAbilityKey != null && LOTMCraft.useArtifactAbilityKey.consumeClick()) {
+            PacketHandler.sendToServer(new UseArtifactAbilityPacket());
+        }
+        //Sealed Artifact Rework:
     }
 
     private static int getIndex(String s) {

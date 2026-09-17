@@ -109,7 +109,12 @@ public class ModDataComponents {
                             .networkSynchronized(ByteBufCodecs.STRING_UTF8)
                             .build()
             );
-
+    //SealedArtifactRework
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> CHARACTERISTIC_CREATED_AT =
+        DATA_COMPONENT_TYPES.register("characteristic_created_at",
+                () -> DataComponentType.<Long>builder()
+                        .persistent(Codec.LONG)
+                        .build());
 
     public static void register(IEventBus eventBus) {
         DATA_COMPONENT_TYPES.register(eventBus);

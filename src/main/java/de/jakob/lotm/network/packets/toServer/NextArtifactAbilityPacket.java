@@ -16,7 +16,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public record NextArtifactAbilityPacket() implements CustomPacketPayload {
     public static final Type<NextArtifactAbilityPacket> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(LOTMCraft.MOD_ID, "next-artifact_ability"));
-
     public static final StreamCodec<FriendlyByteBuf, NextArtifactAbilityPacket> STREAM_CODEC =
             StreamCodec.unit(new NextArtifactAbilityPacket());
 

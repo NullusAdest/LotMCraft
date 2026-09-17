@@ -2365,5 +2365,8 @@
   "ritual.lotmcraft.min_sequence": "Min. Sequence: ",
   "ritual.lotmcraft.general_description": "This seems to be a description of Ritualistic Magic pointed towards a specific entity",
   "block.lotmcraft.sefirah_block": "Sephirot",
-  "lotm.marionette.cycle_hint": "Press %s to cycle marionettes"
+  "lotm.marionette.cycle_hint": "Press %s to cycle marionettes",
+  "lotm.sealed_artifact.merged": "%s infused with %s",
+  "key.beyonders.use_artifact_ability": "Use Artifact Ability"
+
 }

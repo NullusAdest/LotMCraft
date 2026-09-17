@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
 public class SealedArtifactItem extends Item {
 
@@ -47,40 +48,34 @@ public class SealedArtifactItem extends Item {
             return InteractionResultHolder.success(stack);
         }
 
-        if(!level.getGameRules().getBoolean(ModGameRules.ALLOW_ARTIFACTS)){
+         if (!(player instanceof ServerPlayer serverPlayer)) {
+        return InteractionResultHolder.fail(stack);
+        }
+        return tryUseArtifactAbility((ServerLevel) level, serverPlayer, hand, stack);
+    }
+    public static InteractionResultHolder<ItemStack> tryUseArtifactAbility(ServerLevel level, ServerPlayer player, InteractionHand hand, ItemStack stack) {
+        if (!level.getGameRules().getBoolean(ModGameRules.ALLOW_ARTIFACTS)) {
             player.setItemInHand(hand, ItemStack.EMPTY);
-
             return InteractionResultHolder.success(ItemStack.EMPTY);
         }
-
-        DoorAuthorityData doorData = DoorAuthorityData.get((ServerLevel) level);
+        DoorAuthorityData doorData = DoorAuthorityData.get(level);
         if (doorData.isActive() && doorData.getEffectId().equalsIgnoreCase("strengthen")) {
-            ParticleUtil.spawnParticles((ServerLevel) level, ParticleTypes.END_ROD, player.getEyePosition(), 40, .5, .05);
+            ParticleUtil.spawnParticles(level, ParticleTypes.END_ROD, player.getEyePosition(), 40, .5, .05);
             return InteractionResultHolder.fail(stack);
         }
-
         SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);
         if (data == null || data.abilities().isEmpty()) {
             return InteractionResultHolder.fail(stack);
         }
-
-        // Get the currently selected ability
         int selectedIndex = stack.getOrDefault(ModDataComponents.SEALED_ARTIFACT_SELECTED, 0);
-
         Ability ability = data.abilities().get(selectedIndex);
-
         AbilityUtil.setArtifactScaling(player, data.pathway(), data.sequence());
-
-        // Use the ability
-        ability.useAbility((ServerLevel) level, player, true, false, true, false);
-
-        // Apply Use-Only Negative Effects
+        ability.useAbility(level, player, true, false, true, false);
         for (NegativeEffect effect : data.negativeEffect()) {
             if (NegativeEffect.useOnlyTick.contains(effect.getType())) {
                 effect.apply(player, true, List.of(data.pathway()));
             }
         }
-
         return InteractionResultHolder.success(stack);
     }
 
@@ -91,16 +86,18 @@ public class SealedArtifactItem extends Item {
         SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);
         if (data == null) return;
 
-        int selectedIndex = stack.getOrDefault(ModDataComponents.SEALED_ARTIFACT_SELECTED, 0);
-        Ability selectedAbility = data.abilities().get(selectedIndex);
         int pathwayColor = BeyonderData.pathwayInfos.get(data.pathway()).color();
 
         addDivider(tooltipComponents);
         addPathwayInfo(tooltipComponents, data, pathwayColor);
-        addSelectedAbility(tooltipComponents, selectedAbility, pathwayColor);
-        addDivider(tooltipComponents);
-        addAbilityList(tooltipComponents, data, pathwayColor);
-        addDivider(tooltipComponents);
+        if (!data.abilities().isEmpty()) {
+            int selectedIndex = stack.getOrDefault(ModDataComponents.SEALED_ARTIFACT_SELECTED, 0);
+            Ability selectedAbility = data.abilities().get(selectedIndex);
+            addSelectedAbility(tooltipComponents, selectedAbility, pathwayColor);
+            addDivider(tooltipComponents);
+            addAbilityList(tooltipComponents, data, pathwayColor);
+            addDivider(tooltipComponents);
+        }
         addNegativeEffects(tooltipComponents, data);
     }
 
