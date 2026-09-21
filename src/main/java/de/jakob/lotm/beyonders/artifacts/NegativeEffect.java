@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import de.jakob.lotm.LOTMCraft;
 import de.jakob.lotm.beyonders.abilities.core.Ability;
+import de.jakob.lotm.beyonders.artifacts.NegativeEffect.NegativeEffectType;
 import de.jakob.lotm.attachments.DisabledAbilitiesComponent;
 import de.jakob.lotm.attachments.DoorAuthorityData;
 import de.jakob.lotm.attachments.ModAttachments;
@@ -50,7 +51,90 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 import java.util.stream.Stream;
-
+/*
+Sealed artifact rework(Phase 2:Negtive effects)
+Planned effects:
+Darkness:
+    N:when user is asleep can cuase them to be tleported to the concealed relam
+    N:spirit agro
+    N:Lowers Concealment strength
+    N:Lowers Divination Strength
+    N:unable to Interact with objects/players at intervals
+    N:gives misfortune
+    N:Sleep nessisity(If too much time has past after your last sleep, you start taken dmg and negtive effects untill you do)
+WOF:
+    N:applys small misfotune in a area
+    N: makes your avrg luck lower
+    N: causes a High seq beyonder NPC to spawn in hostile to you
+Demoness: 
+    N: causes all nearby mobs to agro on you at intervals
+    N: cuases you to randomly hold the item when changing items
+    N: gets sick
+    N: causes AoE constant dmg around the item
+Abyss:
+    N: causes nearby mobs to hostile to all other mobs
+    N: you will be unable to see players/Npc as themselfs and insted hostile mobs at intervals incresing the more you use it until permenat
+    N: causes Random text messages
+Tyrannt:
+    N:if dmg types get added(more dmg from mind attacks)
+    N:Weaking on land
+    N:when in darkness spawns in beyonder NPC that dont drop any loot
+    N:randomly belts out songs centered on you(could be negtive or postive)
+    N:Random Chat messages
+    N: all nearby enitys slowly take dmg
+Mother:
+    N: when being used stoping all healing sources
+    N: cuases loss of max health replaced with apsobtion hearts(will reset upon death or with the regen effect)
+    N: causes the land around it to turn desole
+    N: all Death spawns in a beyonder NPC of the same strength that is insta hostile and will drop (nothing or the char of the death that spawned it)
+Justicar:
+    N:if removed user gets effect if within a certain radius
+    N:if user multiple times the user takes sanity damg
+    N: bigger agro range
+    N:nertual mobs will be hostile 
+    N: gives the player temp blindness
+    N: random proabishions
+Common:
+    N: add in a task where if one does not kill they take sanity dmg
+    N: cuases dmg upon uses
+    N: user will be effected
+    N: must satisfy a daily villager/player/Npc kill
+    N: if line of sight postive(looking at glass will cause it to turn on you)
+    N: auto uses when specific pathway are nearby
+Sun:
+    N: take massive sanity dmg when held for to long
+    N: causes all nearby enitys to take lava dmg without burning the everoment
+    N:holding the item for to long will reduce  your seq and give you the lost char
+    N: must be feed Living mob deaths before use
+Visonary:
+    N: uses can cause you to develop a split personality(temp lower max sanity when the mind relam comes out edit to Negtive V.12 in the Planned Negtives document)
+    N:longer or multi uses will cause Sanity dmg
+    N: gives random quests that can't be discarded and will result in dmg or death if not completed
+    N: tries to kill the user given its ability
+Fool:
+    N: takes small sanity dmg went equiped
+    N:PLayer will lose the ability to return to their orginal form(resets upon death)
+    N: gain slowness
+    N: limited uses before constant calamitys are done upon the user
+Error:
+    N:drops items randomly
+    N:temp lose the ability to use one ability for 10 mins upon use
+    N: temp drains max health on use
+Door:
+    N:gives false cords
+    N:give flase composs direction
+    N: causes player who hold/see it to gain extrime nauses and blindness
+    N: chance to spawn in beyonder monster NPC that drop nothing when not in use
+    N: small chance to cause the user to randomly teleport into dangorus situations(smaller chance to teleport you to the void)
+Hunter:
+    N: gives a random fear when in the precncess of that fear you randomly get you camera moved and gain (Blindness/Weakness)
+    N: randomly attack nearby enitys
+    N: random trap placement
+Death:
+    N:can disgues itself as a normal item or block or seal artifact(can be seen though when using spirit vision)
+    N:causes nearby enitys to take massive dmg
+    N:spawn in undead mobs on use
+*/
 /**
  * Represents a negative effect that sealed artifacts inflict on their holders
  */

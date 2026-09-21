@@ -6,6 +6,7 @@ import de.jakob.lotm.beyonders.abilities.core.SelectableAbility;
 import de.jakob.lotm.beyonders.artifacts.SealedArtifactData;
 import de.jakob.lotm.data.ModDataComponents;
 import de.jakob.lotm.gui.custom.ability_wheel.AbilityWheelScreen;
+import de.jakob.lotm.gui.custom.artifact_wheel.ArtifactWheelMenu;
 import de.jakob.lotm.network.PacketHandler;
 import de.jakob.lotm.network.packets.toServer.*;
 import de.jakob.lotm.util.ClientBeyonderCache;
@@ -27,6 +28,10 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+
+//Sealed artifact Rework:
+import net.minecraft.world.entity.EquipmentSlot;
+//Sealed artifact Rework:
 
 @EventBusSubscriber(modid = LOTMCraft.MOD_ID, value = Dist.CLIENT)
 public class KeyInputHandler {
@@ -362,20 +367,19 @@ public class KeyInputHandler {
             PacketHandler.sendToServer(new OpenAbilityWheelPacket());
         }
     }
-
+    //Sealed artifact Rework:
     private static void openArtifactWheel() {
         Minecraft mc = Minecraft.getInstance();
-        ItemStack stack = mc.player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!stack.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
-            stack = mc.player.getItemInHand(InteractionHand.OFF_HAND);
-            if (!stack.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
-                return;
+        Player player = mc.player;
+        if (player == null) return;
+        boolean hasSealedArtifact = false;      
+        for (EquipmentSlot slot : ArtifactWheelMenu.SEALED_ARTIFACT_SLOTS) {
+            if (player.getItemBySlot(slot).has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
+                hasSealedArtifact = true;
+                break;
             }
         }
-        SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);
-        if (data == null || data.abilities().isEmpty()) {
-            return;
-        }
-        PacketHandler.sendToServer(new OpenArtifactWheelPacket(stack));
+        if (!hasSealedArtifact) return;
+        PacketHandler.sendToServer(new OpenArtifactWheelPacket(ItemStack.EMPTY));
     }
 }

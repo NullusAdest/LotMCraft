@@ -13,50 +13,78 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+//Sealed artifact Rework:
+import net.minecraft.world.entity.EquipmentSlot;
+import de.jakob.lotm.beyonders.abilities.core.Ability;
+//Sealed artifact Rework:
 
+//Sealed artifact Rework
 public class ArtifactWheelMenu extends AbstractContainerMenu {
 
-    private final ItemStack stack;
+    public static final EquipmentSlot[] SEALED_ARTIFACT_SLOTS = {
+            EquipmentSlot.MAINHAND,
+            EquipmentSlot.OFFHAND,
+            EquipmentSlot.HEAD,
+            EquipmentSlot.CHEST,
+            EquipmentSlot.LEGS,
+            EquipmentSlot.FEET
+    };
+
+    public record WheelEntry(EquipmentSlot slot, int localIndex, String abilityId) {}
+
     private final Inventory playerInventory;
+    private final List<WheelEntry> entries;
 
     public ArtifactWheelMenu(int containerId, Inventory playerInventory, ItemStack stack) {
         super(ModMenuTypes.ARTIFACT_WHEEL_MENU.get(), containerId);
         this.playerInventory = playerInventory;
-        this.stack = stack;
+        this.entries = buildEntries(playerInventory.player);
+    }
+
+    public static List<WheelEntry> buildEntries(Player player) {
+        List<WheelEntry> result = new ArrayList<>();
+        for (EquipmentSlot slot : SEALED_ARTIFACT_SLOTS) {
+            ItemStack equipped = player.getItemBySlot(slot);
+            SealedArtifactData data = equipped.get(ModDataComponents.SEALED_ARTIFACT_DATA);
+            if (data == null || data.abilities().isEmpty()) continue;
+            List<Ability> abilities = data.abilities();
+            for (int i = 0; i < abilities.size(); i++) {result.add(new WheelEntry(slot, i, abilities.get(i).getId()));}
+        }
+        return result;
     }
 
     public List<String> getAbilities() {
-        SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);
-        if (data == null || data.abilities().isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<String> abilityNames = data.abilities().stream()
-                .map(ability -> ability.getId())
-                .toList();
-        if (abilityNames.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return abilityNames;
+        return entries.stream().map(WheelEntry::abilityId).toList();
     }
 
     public int getSelectedAbilityIndex() {
-        return stack.getOrDefault(ModDataComponents.SEALED_ARTIFACT_SELECTED, 0);
+        Player player = playerInventory.player;
+        for (int i = 0; i < entries.size(); i++) {
+            WheelEntry entry = entries.get(i);
+            ItemStack equipped = player.getItemBySlot(entry.slot());
+            boolean active = equipped.getOrDefault(ModDataComponents.SEALED_ARTIFACT_WHEEL_ACTIVE, false);
+            int localSelected = equipped.getOrDefault(ModDataComponents.SEALED_ARTIFACT_SELECTED, 0);
+            if (active && localSelected == entry.localIndex()) {return i;}
+        }
+        return 0;
     }
 
-    public void setSelectedAbilityIndex(int index) {
-        ItemStack stackInHand = playerInventory.player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (!stackInHand.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
-            stackInHand = playerInventory.player.getItemInHand(InteractionHand.OFF_HAND);
-            if (!stackInHand.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
-                return;
+    public void setSelectedAbilityIndex(int flatIndex) {
+        if (flatIndex < 0 || flatIndex >= entries.size()) return;
+        WheelEntry entry = entries.get(flatIndex);
+        Player player = playerInventory.player;
+        for (EquipmentSlot slot : SEALED_ARTIFACT_SLOTS) {
+            ItemStack equipped = player.getItemBySlot(slot);
+            if (equipped.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
+                equipped.set(ModDataComponents.SEALED_ARTIFACT_WHEEL_ACTIVE, false);
             }
         }
-        stackInHand.set(ModDataComponents.SEALED_ARTIFACT_SELECTED, index);
-        PacketHandler.sendToServer(
-                new SyncArtifactAbilityWheel(index)
-        );
+        ItemStack target = player.getItemBySlot(entry.slot());
+        target.set(ModDataComponents.SEALED_ARTIFACT_SELECTED, entry.localIndex());
+        target.set(ModDataComponents.SEALED_ARTIFACT_WHEEL_ACTIVE, true);
+        PacketHandler.sendToServer(new SyncArtifactAbilityWheel(flatIndex));
     }
-
+    // Sealed Artifcat Rework:
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         return ItemStack.EMPTY;

@@ -33,13 +33,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+//Sealed artifact Rework:
+import net.minecraft.world.entity.EquipmentSlot;
+//Sealed artifact Rework:
 
 public class SealedArtifactItem extends Item {
 
     public SealedArtifactItem(Properties properties) {
         super(properties);
     }
-
+    //Sealed Artifact Rework:
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
@@ -51,11 +54,12 @@ public class SealedArtifactItem extends Item {
          if (!(player instanceof ServerPlayer serverPlayer)) {
         return InteractionResultHolder.fail(stack);
         }
-        return tryUseArtifactAbility((ServerLevel) level, serverPlayer, hand, stack);
+        EquipmentSlot slot = (hand == InteractionHand.OFF_HAND) ? EquipmentSlot.OFFHAND : EquipmentSlot.MAINHAND;
+        return tryUseArtifactAbility((ServerLevel) level, serverPlayer, slot, stack);
     }
-    public static InteractionResultHolder<ItemStack> tryUseArtifactAbility(ServerLevel level, ServerPlayer player, InteractionHand hand, ItemStack stack) {
+    public static InteractionResultHolder<ItemStack> tryUseArtifactAbility(ServerLevel level, ServerPlayer player, EquipmentSlot slot, ItemStack stack) {
         if (!level.getGameRules().getBoolean(ModGameRules.ALLOW_ARTIFACTS)) {
-            player.setItemInHand(hand, ItemStack.EMPTY);
+            player.setItemSlot(slot, ItemStack.EMPTY);
             return InteractionResultHolder.success(ItemStack.EMPTY);
         }
         DoorAuthorityData doorData = DoorAuthorityData.get(level);
@@ -78,7 +82,6 @@ public class SealedArtifactItem extends Item {
         }
         return InteractionResultHolder.success(stack);
     }
-
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
@@ -86,8 +89,10 @@ public class SealedArtifactItem extends Item {
         SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);
         if (data == null) return;
 
+        appendTooltip(stack, data, tooltipComponents);
+    }
+    public static void appendTooltip(ItemStack stack, SealedArtifactData data, List<Component> tooltipComponents) {
         int pathwayColor = BeyonderData.pathwayInfos.get(data.pathway()).color();
-
         addDivider(tooltipComponents);
         addPathwayInfo(tooltipComponents, data, pathwayColor);
         if (!data.abilities().isEmpty()) {
@@ -100,7 +105,7 @@ public class SealedArtifactItem extends Item {
         }
         addNegativeEffects(tooltipComponents, data);
     }
-
+    //Sealed Artifact Rework:
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected){
         if (level.isClientSide) return;
@@ -137,9 +142,8 @@ public class SealedArtifactItem extends Item {
         }
 
     }
-
-
-    private void addPathwayInfo(List<Component> tooltip, SealedArtifactData data, int pathwayColor) {
+    //Sealed artifact Rework:
+    private static void addPathwayInfo(List<Component> tooltip, SealedArtifactData data, int pathwayColor) {
         tooltip.add(
                 label("lotm.pathway")
                         .append(Component.translatable("lotm.pathway." + data.pathway()).withColor(pathwayColor))
@@ -150,7 +154,7 @@ public class SealedArtifactItem extends Item {
         );
     }
 
-    private void addSelectedAbility(List<Component> tooltip, Ability ability, int pathwayColor) {
+    private static void addSelectedAbility(List<Component> tooltip, Ability ability, int pathwayColor) {
         tooltip.add(Component.empty());
         tooltip.add(
                 Component.literal("✦ ").withColor(pathwayColor)
@@ -163,7 +167,7 @@ public class SealedArtifactItem extends Item {
         tooltip.add(Component.empty());
     }
 
-    private void addAbilityList(List<Component> tooltip, SealedArtifactData data, int pathwayColor) {
+    private static void addAbilityList(List<Component> tooltip, SealedArtifactData data, int pathwayColor) {
         tooltip.add(sectionHeader("lotm.sealed_artifact.abilities", pathwayColor));
 
         for (Ability ability : data.abilities()) {
@@ -175,7 +179,7 @@ public class SealedArtifactItem extends Item {
         }
     }
 
-    private void addNegativeEffects(List<Component> tooltip, SealedArtifactData data) {
+    private static void addNegativeEffects(List<Component> tooltip, SealedArtifactData data) {
         tooltip.add(sectionHeader("lotm.sealed_artifact.negative_effect", ChatFormatting.DARK_RED));
 
         for (NegativeEffect effect : data.negativeEffect()) {
@@ -185,7 +189,7 @@ public class SealedArtifactItem extends Item {
             );
         }
     }
-
+    //Sealed articaft rework
     // ── Tooltip Helpers ─────────────────────────────────────────────────
 
     private static void addDivider(List<Component> tooltip) {

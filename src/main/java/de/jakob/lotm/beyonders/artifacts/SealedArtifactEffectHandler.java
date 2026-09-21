@@ -10,7 +10,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.List;
-
 /**
  * Handles the negative effects of sealed artifacts on players
  */
@@ -50,8 +49,18 @@ public class SealedArtifactEffectHandler {
                 applyHotBarNegativeEffect(player, stack);
             }
         }
+        //check Armor for Sealed artifact
+        for (ItemStack armorPiece : player.getInventory().armor) {
+            if (armorPiece.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
+                applyHotBarNegativeEffect(player, armorPiece);
+                SealedArtifactData armorData = armorPiece.get(ModDataComponents.SEALED_ARTIFACT_DATA);
+                if (armorData != null) {
+                    applyInventoryEffect(player, armorData);
+                }
+            }
+        }
 
-        // Check inventory for some passive effects (optional)
+        // Check inventory for some passive effects
         for (ItemStack stack : player.getInventory().items) {
             if (stack.has(ModDataComponents.SEALED_ARTIFACT_DATA)) {
                 SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);

@@ -4,6 +4,7 @@ import de.jakob.lotm.LOTMCraft;
 import de.jakob.lotm.beyonders.abilities.darkness.NightmareAbility;
 import de.jakob.lotm.util.data.ClientCorrosionFovCache;
 import de.jakob.lotm.beyonders.artifacts.SealedArtifactData;
+import de.jakob.lotm.beyonders.artifacts.SealedArtifactItem;
 import de.jakob.lotm.data.ModDataComponents;
 import de.jakob.lotm.item.ModItems;
 import de.jakob.lotm.network.PacketHandler;
@@ -29,7 +30,10 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.extensions.common.IClientBlockExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.lwjgl.glfw.GLFW;
-
+//Sealed artifacts Rework
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+//Sealed artifacts Rework
 @EventBusSubscriber(modid = LOTMCraft.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents {
 
@@ -161,4 +165,14 @@ public class ClientEvents {
             event.setFOV(event.getFOV() * multiplier);
         }
     }
+    //Sealed Artifacts Rework:
+    @SubscribeEvent
+    public static void onItemTooltip(ItemTooltipEvent event) {
+        ItemStack stack = event.getItemStack();
+        if (stack.getItem() instanceof SealedArtifactItem) return;
+        SealedArtifactData data = stack.get(ModDataComponents.SEALED_ARTIFACT_DATA);
+        if (data == null) return;
+        SealedArtifactItem.appendTooltip(stack, data, event.getToolTip());
+    }
+    //Sealed Artifacts Rework:
 }
